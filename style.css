@@ -1,74 +1,27 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+// Initialize the map centered on Bangalore
+const map = L.map("map").setView([12.9716, 77.5946], 10);
 
-html, body {
-    height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+// Add the tile layer
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+}).addTo(map);
 
-#map {
-    width: 75%;
-    height: 100%;
-    float: left;
-}
+// Add a marker
+const marker = L.marker([12.9716, 77.5946]).addTo(map);
+marker.bindPopup("Bangalore").openPopup();
 
-#info-card {
-    width: 25%;
-    height: 100%;
-    padding: 20px;
-    background-color: #f9f9f9;
-    position: fixed;
-    top: 0;
-    right: 0;
-    box-shadow: -4px 0px 6px rgba(0,0,0,0.1);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: all 0.3s ease;
-}
+// Add a circle
+const circle = L.circle([12.9616, 77.5846], {
+  color: "blue",
+  fillColor: "#3f51b5",
+  fillOpacity: 0.4,
+  radius: 500,
+}).addTo(map);
 
-h3 {
-    color: #444;
-    margin-bottom: 10px;
-    font-size: 1.5em;
-}
-
-#location-details {
-    color: #777;
-    margin-bottom: 20px;
-    font-size: 1.1em;
-    text-align: center;
-}
-
-button {
-    padding: 10px 20px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-/* Media Query for Mobile Devices */
-@media (max-width: 768px) {
-    #map {
-        width: 100%;
-        height: 60%;
-    }
-
-    #info-card {
-        width: 100%;
-        height: 40%;
-        position: static;  /* Allow the info card to stack below the map */
-        box-shadow: none;  /* Remove shadow when stacked */
-    }
-}
+// Add a polygon
+const polygon = L.polygon([
+  [12.97, 77.59],
+  [12.98, 77.60],
+  [12.975, 77.58],
+]).addTo(map);
