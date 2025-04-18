@@ -26,6 +26,34 @@ var drawControl = new L.Control.Draw({
 });
 map.addControl(drawControl);
 
+// Handle created polygons
+map.on(L.Draw.Event.CREATED, function(event) {
+    var layer = event.layer;
+
+    if (event.layerType === 'polygon') {
+        // Add tooltip
+        layer.bindTooltip("Polygon Info").openTooltip();
+
+        // Set random color
+        layer.setStyle({
+            color: "#" + Math.floor(Math.random() * 16777215).toString(16), // Random color
+            weight: 3,
+            opacity: 0.8
+        });
+
+        // Save polygon coordinates
+        var coordinates = layer.getLatLngs();
+        console.log("Polygon Coordinates:", coordinates);
+        localStorage.setItem("polygonData", JSON.stringify(coordinates));
+
+        // Add click event for interaction
+        layer.on('click', function() {
+            alert("Polygon clicked! Details: " + JSON.stringify(layer.getLatLngs()));
+        });
+    }
+
+    drawnItems.addLayer(layer);
+});
 
 // Sample markers with details for Bangalore
 var markers = [
