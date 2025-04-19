@@ -25,16 +25,38 @@ var drawControl = new L.Control.Draw({
 });
 map.addControl(drawControl);
 
-// Function to add circles at each vertex of a polygon
+// Function to generate a random color
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+// Function to add circles at each vertex of a polygon with random colors
 function addCirclesForPolygon(latlngs) {
     latlngs[0].forEach(function (latlng) {
+        var randomColor = getRandomColor();
         var circle = L.circle(latlng, {
-            color: 'blue',
-            fillColor: '#3388ff',
-            fillOpacity: 0.5,
+            color: randomColor,
+            fillColor: randomColor,
+            fillOpacity: 0.8,
             radius: 5
         }).addTo(map);
     });
+}
+
+// Function to add a circle for a marker with a random color
+function addCircleForMarker(latlng) {
+    var randomColor = getRandomColor();
+    L.circle(latlng, {
+        color: randomColor,
+        fillColor: randomColor,
+        fillOpacity: 0.8,
+        radius: 5
+    }).addTo(map);
 }
 
 // Function to save data to local storage
@@ -74,6 +96,9 @@ function loadDataFromLocalStorage() {
             } else if (item.type === 'marker') {
                 var marker = L.marker(item.latlng).addTo(map);
                 drawnItems.addLayer(marker);
+
+                // Add a circle for the marker
+                addCircleForMarker(item.latlng);
             }
         });
     }
@@ -89,6 +114,9 @@ map.on(L.Draw.Event.CREATED, function (event) {
     if (layer instanceof L.Polygon) {
         // Add circles for each point in the polygon
         addCirclesForPolygon(layer.getLatLngs());
+    } else if (layer instanceof L.Marker) {
+        // Add a circle for the marker
+        addCircleForMarker(layer.getLatLng());
     }
 
     drawnItems.addLayer(layer);
