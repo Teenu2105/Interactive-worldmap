@@ -25,6 +25,18 @@ var drawControl = new L.Control.Draw({
 });
 map.addControl(drawControl);
 
+// Function to add circles at each vertex of a polygon
+function addCirclesForPolygon(latlngs) {
+    latlngs[0].forEach(function (latlng) {
+        var circle = L.circle(latlng, {
+            color: 'blue',
+            fillColor: '#3388ff',
+            fillOpacity: 0.5,
+            radius: 5
+        }).addTo(map);
+    });
+}
+
 // Function to save data to local storage
 function saveDataToLocalStorage() {
     var data = [];
@@ -56,6 +68,9 @@ function loadDataFromLocalStorage() {
             if (item.type === 'polygon') {
                 var polygon = L.polygon(item.latlngs).addTo(map);
                 drawnItems.addLayer(polygon);
+
+                // Add circles for each point in the polygon
+                addCirclesForPolygon(item.latlngs);
             } else if (item.type === 'marker') {
                 var marker = L.marker(item.latlng).addTo(map);
                 drawnItems.addLayer(marker);
@@ -70,6 +85,12 @@ loadDataFromLocalStorage();
 // Handle draw:created event to add layers
 map.on(L.Draw.Event.CREATED, function (event) {
     var layer = event.layer;
+
+    if (layer instanceof L.Polygon) {
+        // Add circles for each point in the polygon
+        addCirclesForPolygon(layer.getLatLngs());
+    }
+
     drawnItems.addLayer(layer);
 });
 
