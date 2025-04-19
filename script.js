@@ -20,7 +20,8 @@ var drawControl = new L.Control.Draw({
     },
     draw: {
         polygon: true,
-        marker: true,
+        polyline: true, // Enable drawing of polylines
+        marker: true
     }
 });
 map.addControl(drawControl);
@@ -35,9 +36,9 @@ function getRandomColor() {
     return color;
 }
 
-// Function to add circles at each vertex of a polygon with random colors
-function addCirclesForPolygon(latlngs) {
-    latlngs[0].forEach(function (latlng) {
+// Function to add circles at each vertex of a polygon or polyline with random colors
+function addCirclesForVertices(latlngs) {
+    latlngs.forEach(function (latlng) {
         var randomColor = getRandomColor();
         var circle = L.circle(latlng, {
             color: randomColor,
@@ -63,11 +64,16 @@ function addCircleForMarker(latlng) {
 function saveDataToLocalStorage() {
     var data = [];
 
-    // Save all drawn layers (polygons and markers)
+    // Save all drawn layers (polygons, polylines, and markers)
     drawnItems.eachLayer(function (layer) {
         if (layer instanceof L.Polygon) {
             data.push({
                 type: 'polygon',
+                latlngs: layer.getLatLngs()
+            });
+        } else if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+            data.push({
+                type: 'polyline',
                 latlngs: layer.getLatLngs()
             });
         } else if (layer instanceof L.Marker) {
@@ -96,8 +102,15 @@ function loadDataFromLocalStorage() {
                 var polygon = L.polygon(item.latlngs).addTo(map);
                 drawnItems.addLayer(polygon);
 
-                // Add circles for each point in the polygon
-                addCirclesForPolygon(item.latlngs);
+                // Add circles for each vertex in the polygon
+                addCirclesForVertices(item.latlngs[0]);
+            } else if (item.type === 'polyline') {
+                // Load polyline
+                var polyline = L.polyline(item.latlngs).addTo(map);
+                drawnItems.addLayer(polyline);
+
+                // Add circles for each vertex in the polyline
+                addCirclesForVertices(item.latlngs);
             } else if (item.type === 'marker') {
                 // Load marker
                 var marker = L.marker(item.latlng).addTo(map);
@@ -120,8 +133,11 @@ map.on(L.Draw.Event.CREATED, function (event) {
     var layer = event.layer;
 
     if (layer instanceof L.Polygon) {
-        // Add circles for each point in the polygon
-        addCirclesForPolygon(layer.getLatLngs());
+        // Add circles for each vertex in the polygon
+        addCirclesForVertices(layer.getLatLngs()[0]);
+    } else if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+        // Add circles for each vertex in the polyline
+        addCirclesForVertices(layer.getLatLngs());
     } else if (layer instanceof L.Marker) {
         // Add a circle for the marker
         addCircleForMarker(layer.getLatLng());
