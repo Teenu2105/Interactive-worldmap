@@ -79,21 +79,27 @@ function saveDataToLocalStorage() {
     });
 
     localStorage.setItem('mapData', JSON.stringify(data));
+    console.log("Saved data:", data); // Debugging log
     alert("Map data saved successfully!");
 }
 
 // Function to load data from local storage
 function loadDataFromLocalStorage() {
     var data = localStorage.getItem('mapData');
+    console.log("Loaded data:", data); // Debugging log
+
     if (data) {
+        // Parse the saved data
         JSON.parse(data).forEach(function (item) {
             if (item.type === 'polygon') {
+                // Load polygon
                 var polygon = L.polygon(item.latlngs).addTo(map);
                 drawnItems.addLayer(polygon);
 
                 // Add circles for each point in the polygon
                 addCirclesForPolygon(item.latlngs);
             } else if (item.type === 'marker') {
+                // Load marker
                 var marker = L.marker(item.latlng).addTo(map);
                 drawnItems.addLayer(marker);
 
@@ -101,6 +107,8 @@ function loadDataFromLocalStorage() {
                 addCircleForMarker(item.latlng);
             }
         });
+    } else {
+        console.log("No data found in localStorage.");
     }
 }
 
