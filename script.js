@@ -45,6 +45,7 @@ function saveDataToLocalStorage() {
     });
 
     localStorage.setItem('mapData', JSON.stringify(data));
+    alert("Map data saved successfully!");
 }
 
 // Function to load data from local storage
@@ -66,15 +67,11 @@ function loadDataFromLocalStorage() {
 // Load data when the page is loaded
 loadDataFromLocalStorage();
 
-// Handle draw:created event to save polygons and markers
+// Handle draw:created event to add layers
 map.on(L.Draw.Event.CREATED, function (event) {
     var layer = event.layer;
     drawnItems.addLayer(layer);
-
-    // Save the newly added data
-    saveDataToLocalStorage();
 });
 
-// Save data whenever an edit or delete action occurs
-map.on(L.Draw.Event.EDITED, saveDataToLocalStorage);
-map.on(L.Draw.Event.DELETED, saveDataToLocalStorage);
+// Add event listener for the "Save" button
+document.getElementById('save-btn').addEventListener('click', saveDataToLocalStorage);
