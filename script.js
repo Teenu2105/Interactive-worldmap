@@ -26,19 +26,30 @@ var drawControl = new L.Control.Draw({
 });
 map.addControl(drawControl);
 
+// Function to generate random colors
+function getRandomColor() {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+}
+
 // Handle created polygons
 map.on(L.Draw.Event.CREATED, function(event) {
     var layer = event.layer;
 
     if (event.layerType === 'polygon') {
-        // Add tooltip
-        layer.bindTooltip("Polygon Info").openTooltip();
+        // Get the vertices (latlngs) of the polygon
+        var latlngs = layer.getLatLngs()[0]; // Get the outer boundary points
 
-        // Set random color
-        layer.setStyle({
-            color: "#" + Math.floor(Math.random() * 16777215).toString(16), // Random color
-            weight: 3,
-            opacity: 0.8
+        // Loop through each vertex and create a circle at each point
+        latlngs.forEach(function(latlng) {
+            var circle = L.circle(latlng, {
+                color: getRandomColor(), // Random border color
+                fillColor: getRandomColor(), // Random fill color
+                fillOpacity: 0.6,
+                radius: 10 // Radius in meters
+            }).addTo(map);
+
+            // Optional: Add a tooltip to show the coordinates of the circle
+            circle.bindTooltip(`Lat: ${latlng.lat.toFixed(4)}, Lng: ${latlng.lng.toFixed(4)}`).openTooltip();
         });
 
         // Save polygon coordinates
